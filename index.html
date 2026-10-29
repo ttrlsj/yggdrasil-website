@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>이그드리아 연대기 | 신성한 아카이브</title>
+    <!-- 고전 판타지 및 신전풍 폰트 -->
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@700&family=Cinzel:wght@500;700&family=Noto+Serif+KR:wght@400;700&family=Pretendard:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <style>
+        :root {
+            --temple-bg: #090c0a;
+            --card-marble: rgba(20, 26, 22, 0.88);
+            --gold-divine: #dfb76c;
+            --gold-light: #f7e7c4;
+            --leaf-green: #52a373;
+            --text-light: #f1f5f9;
+            --text-dim: #a3b8cc;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: var(--temple-bg);
+            color: var(--text-light);
+            font-family: 'Pretendard', sans-serif;
+            overflow-x: hidden;
+            background-image: linear-gradient(
+                rgba(9, 12, 10, 0.82), 
+                rgba(9, 12, 10, 0.92)
+            ), url('bg.png');
+            background-attachment: fixed;
+            background-size: cover;
+            background-position: center;
+        }
+
+        h1, h2, h3, .serif {
+            font-family: 'Cinzel', 'Noto Serif KR', serif;
+        }
+
+        /* 1. 게이트 (입장) 화면 */
+        #gate-screen {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background: radial-gradient(circle at center, #131c16 0%, #050806 100%);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 1s ease, visibility 1s ease;
+            text-align: center;
+            padding: 20px;
+            border: 12px solid var(--gold-divine);
+        }
+
+        #gate-screen.hidden {
+            opacity: 0;
+            visibility: hidden;
+        }
+
+        .temple-crest {
+            font-size: 2.5rem;
+            color: var(--gold-divine);
+            margin-bottom: 15px;
+            text-shadow: 0 0 15px rgba(223, 183, 108, 0.6);
+        }
+
+        .gate-title {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 3.2rem;
+            color: var(--gold-light);
+            letter-spacing: 6px;
+            margin-bottom: 15px;
+            text-shadow: 0 0 25px rgba(223, 183, 108, 0.5);
+        }
+
+        .gate-prompt {
+            font-size: 1.2rem;
+            color: var(--text-dim);
+            margin-bottom: 40px;
+            letter-spacing: 2px;
+        }
+
+        .enter-btn {
+            background: rgba(223, 183, 108, 0.1);
+            border: 2px solid var(--gold-divine);
+            color: var(--gold-light);
+            padding: 16px 50px;
+            font-size: 1.15rem;
+            font-family: 'Cinzel', serif;
+            letter-spacing: 3px;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: all 0.4s ease;
+            box-shadow: 0 0 20px rgba(223, 183, 108, 0.2);
+        }
+
+        .enter-btn:hover {
+            background: var(--gold-divine);
+            color: #000;
+            box-shadow: 0 0 40px rgba(223, 183, 108, 0.8);
+            transform: translateY(-3px);
+        }
+
+        /* 2. 메인 웹사이트 레이아웃 */
+        #main-content {
+            opacity: 0;
+            transition: opacity 1.2s ease 0.3s;
+            max-width: 1280px;
+            margin: 0 auto;
+            padding: 20px 20px 60px;
+        }
+
+        #main-content.visible {
+            opacity: 1;
+        }
+
+        /* 신전 네비게이션 바 */
+        nav.top-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 25px 30px;
+            background: rgba(15, 22, 17, 0.85);
+            border: 1px solid var(--gold-divine);
+            border-radius: 8px;
+            margin-bottom: 40px;
+            flex-wrap: wrap;
+            gap: 15px;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.6);
+        }
+
+        .nav-logo {
+            font-family: 'Cinzel Decorative', serif;
+            font-size: 1.6rem;
+            color: var(--gold-light);
+            letter-spacing: 2px;
+        }
+
+        .nav-menu {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .nav-btn {
+            background: transparent;
+            border: 1px solid rgba(223, 183, 108, 0.4);
+            color: var(--text-dim);
+            padding: 9px 18px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .nav-btn:hover, .nav-btn.active {
+            color: #000;
+            background: var(--gold-divine);
+            border-color: var(--gold-light);
+            box-shadow: 0 0 15px rgba(223, 183, 108, 0.5);
+        }
+
+        /* 콘텐츠 섹션 */
+        .page-section {
+            display: none;
+        }
+
+        .page-section.active {
+            display: block;
+        }
+
+        .section-title {
+            font-size: 2rem;
+            color: var(--gold-light);
+            border-left: 5px solid var(--gold-divine);
+            padding-left: 18px;
+            margin-bottom: 30px;
+            letter-spacing: 1px;
+        }
+
+        /* 세계관 연표 */
+        .story-container {
+            background: var(--card-marble);
+            border: 1px solid var(--gold-divine);
+            border-radius: 8px;
+            padding: 40px;
+            backdrop-filter: blur(8px);
+            line-height: 1.85;
+            color: #cbd5e1;
+            box-shadow: inset 0 0 30px rgba(0,0,0,0.5);
+        }
+
+        .story-container h3 {
+            color: var(--gold-divine);
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            margin-top: 30px;
+        }
+
+        .story-container h3:first-child {
+            margin-top: 0;
+        }
+
+        .timeline {
+            border-left: 2px solid var(--gold-divine);
+            padding-left: 25px;
+            margin-top: 25px;
+        }
+
+        .timeline-item {
+            margin-bottom: 25px;
+            position: relative;
+        }
+
+        .timeline-item h4 {
+            color: var(--gold-light);
+            font-size: 1.15rem;
+            margin-bottom: 6px;
+        }
+
+        /* 서브 탭 */
+        .sub-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            flex-wrap: wrap;
+        }
+
+        .sub-tab-btn {
+            background: rgba(255,255,255,0.03);
+            border: 1px solid rgba(223, 183, 108, 0.3);
+            color: var(--text-dim);
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: all 0.2s;
+        }
+
+        .sub-tab-btn:hover, .sub-tab-btn.active {
+            background: var(--leaf-green);
+            color: #fff;
+            border-color: transparent;
+        }
+
+        /* 그리드 및 카드 */
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 25px;
+        }
+
+        .card {
+            background: var(--card-marble);
+            border: 1px solid rgba(223, 183, 108, 0.35);
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.35s ease;
+            backdrop-filter: blur(5px);
+            position: relative;
+        }
+
+        .card:hover {
+            transform: translateY(-7px);
+            border-color: var(--gold-divine);
+            box-shadow: 0 12px 25px rgba(0,0,0,0.7), 0 0 15px rgba(223, 183, 108, 0.3);
+        }
+
+        .card-img-box {
+            width: 100%;
+            height: 280px;
+            background-color: #121814;
+            background-size: cover;
+            background-position: center top;
+            border-bottom: 1px solid rgba(223, 183, 108, 0.25);
+        }
+
+        .card-body {
+            padding: 20px;
+        }
+
+        .card .badge {
+            font-size: 0.75rem;
+            padding: 3px 8px;
+            border-radius: 3px;
+            background: rgba(223, 183, 108, 0.15);
+            color: var(--gold-divine);
+            display: inline-block;
+            margin-bottom: 10px;
+            border: 1px solid rgba(223, 183, 108, 0.2);
+        }
+
+        .card h3 {
+            color: var(--gold-light);
+            font-size: 1.35rem;
+            margin-bottom: 6px;
+        }
+
+        .card .sub-info {
+            font-size: 0.85rem;
+            color: var(--text-dim);
+            margin-bottom: 12px;
+        }
+
+        .card p {
+            font-size: 0.9rem;
+            color: #cbd5e1;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+            line-height: 1.5;
+        }
+
+        /* 모달 팝업 */
+        .modal {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.88);
+            backdrop-filter: blur(8px);
+            display: none;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            padding: 20px;
+        }
+
+        .modal-box {
+            background: #0f1411;
+            border: 2px solid var(--gold-divine);
+            padding: 35px;
+            border-radius: 8px;
+            max-width: 680px;
+            width: 100%;
+            max-height: 85vh;
+            overflow-y: auto;
+            position: relative;
+            box-shadow: 0 0 40px rgba(0,0,0,0.9);
+        }
+
+        .modal-img-box {
+            width: 100%;
+            height: 360px;
+            background-color: #1a221c;
+            background-size: cover;
+            background-position: center top;
+            border-radius: 6px;
+            margin-bottom: 20px;
+            border: 1px solid var(--gold-divine);
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 15px; right: 20px;
+            color: var(--text-dim);
+            font-size: 2rem;
+            cursor: pointer;
+        }
+
+        .modal-title-area {
+            border-bottom: 1px solid rgba(223, 183, 108, 0.3);
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .modal-title-area h2 {
+            color: var(--gold-light);
+            font-size: 1.9rem;
+        }
+
+        .modal-title-area .tag-line {
+            color: var(--text-dim);
+            font-size: 0.95rem;
+            margin-top: 5px;
+        }
+
+        .info-row {
+            margin-bottom: 10px;
+            background: rgba(255,255,255,0.03);
+            padding: 10px 14px;
+            border-radius: 4px;
+            font-size: 0.95rem;
+        }
+
+        .info-row strong {
+            color: var(--gold-divine);
+            display: inline-block;
+            width: 110px;
+        }
+
+        .info-desc-box {
+            margin-top: 20px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(223, 183, 108, 0.2);
+            line-height: 1.75;
+            color: var(--text-light);
+        }
+
+        /* 🎵 우측 하단 BGM 플레이어 스타일 */
+        #bgm-player-box {
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            background: rgba(13, 18, 15, 0.92);
+            border: 1.5px solid var(--gold-divine);
+            border-radius: 30px;
+            padding: 10px 18px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            z-index: 9998;
+            box-shadow: 0 5px 25px rgba(0,0,0,0.8);
+            backdrop-filter: blur(6px);
+        }
+
+        .bgm-icon {
+            font-size: 1.2rem;
+            color: var(--gold-divine);
+            animation: none;
+        }
+
+        .bgm-icon.playing {
+            animation: spin 4s linear infinite;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .bgm-btn {
+            background: transparent;
+            border: 1px solid rgba(223, 183, 108, 0.5);
+            color: var(--gold-light);
+            width: 32px; height: 32px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            transition: all 0.3s;
+        }
+
+        .bgm-btn:hover {
+            background: var(--gold-divine);
+            color: #000;
+            box-shadow: 0 0 10px rgba(223, 183, 108, 0.6);
+        }
+
+        .bgm-volume {
+            width: 70px;
+            accent-color: var(--gold-divine);
+            cursor: pointer;
+        }
+
+        .bgm-title {
+            font-size: 0.8rem;
+            color: var(--text-dim);
+            letter-spacing: 1px;
+            font-family: 'Cinzel', serif;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 입장 화면 -->
+    <div id="gate-screen">
+        <div class="temple-crest">🌿🏛️🌿</div>
+        <div class="gate-title">YGGDRIA CHRONICLES</div>
+        <div class="gate-prompt">이그드리아 대륙으로 진입하시겠습니까?</div>
+        <button class="enter-btn" onclick="enterWorld()">예 (YES)</button>
+    </div>
+
+    <!-- 메인 콘텐츠 영역 -->
+    <div id="main-content">
+        <!-- 신전 네비게이션 바 -->
+        <nav class="top-nav">
+            <div class="nav-logo">🏛️ YGGDRIA</div>
+            <div class="nav-menu">
+                <button class="nav-btn active" onclick="switchPage('story', this)">세계관 & 연표</button>
+                <button class="nav-btn" onclick="switchPage('factions', this)">세력 소개</button>
+                <button class="nav-btn" onclick="switchPage('main-chars', this)">주요 인물</button>
+                <button class="nav-btn" onclick="switchPage('sub-chars', this)">조연 인물</button>
+                <button class="nav-btn" onclick="switchPage('monsters', this)">마수 도감</button>
+            </div>
+        </nav>
+
+        <!-- [페이지 1] 세계관 & 연표 -->
+        <section id="page-story" class="page-section active">
+            <h2 class="section-title">대륙의 기록과 연표 (현재: 교단력 1012년)</h2>
+            <div class="story-container">
+                <h3>위그드라실의 손길과 사계의 대륙</h3>
+                <p>위그드라실의 손길로 탄생한 대륙, 이그드리아. 대륙의 탄생과 함께 자라난 세계수는 이 세상에 활기를 불어넣었고, 동서남북에는 각기 다른 사계절의 색깔이 뚜렷해졌습니다. 동쪽의 봄 '플로리아 왕국', 남쪽의 여름 '이그니아 제국', 서쪽의 가을 '하르베스트라 연맹국', 북쪽의 겨울 '글라시아 군국'이 번영을 누렸습니다.</p>
+
+                <h3>대리인의 타락과 마왕의 탄생</h3>
+                <p>이토록 평화로운 시기가 있기 전, 과거에는 절망만이 가득했습니다. 문명이 발달할수록 지성체들은 오만해졌고 서로를 시기하며 전쟁에 휩싸였습니다. 이를 중재하기 위해 위그드라실은 자신의 대리인을 창조했으나, 전쟁을 실제로 목격한 대리인의 마음속엔 <em>〈이들에게 정녕 구원이 가능한가? …불가능하다.〉</em>라는 의문이 싹텄습니다. 그 순간 대리인의 본질이 검게 물들며 '마왕'으로 변모하였고, 마수들을 창조해 수많은 목숨을 앗아가기 시작했습니다.</p>
+
+                <h3>심연의 봉인과 1000년의 흐름</h3>
+                <p>위그드라실은 격(格)의 손상을 감수하며 하계에 직접 개입, 마왕을 대륙 깊은 지하이자 세계수의 뿌리가 존재하는 심연에 봉인했습니다. 그로부터 1000년이 지나 마왕이라는 존재조차 잊혀질 무렵, 심연에서 다시금 불길한 기운이 꿈틀거리기 시작합니다.</p>
+
+                <h3>주요 연표 (Chronology)</h3>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <h4>태초 (Genesis Era)</h4>
+                        <p>위그드라실의 손길로 이그드리아 대륙 탄생 및 사계국(봄·여름·가을·겨울) 분할.</p>
+                    </div>
+                    <div class="timeline-item">
+                        <h4>고대 전쟁기</h4>
+                        <p>지성체들의 오만과 전쟁. 대리인의 타락 및 마왕의 탄생, 마수들의 대륙 유린.</p>
+                    </div>
+                    <div class="timeline-item">
+                        <h4>교단력 원년 (Year 1)</h4>
+                        <p>위그드라실의 직접 개입으로 마왕을 심연에 봉인. 평화를 수호하기 위해 교단이 창설되고 교단력 제정.</p>
+                    </div>
+                    <div class="timeline-item">
+                        <h4>현재 — 교단력 1012년 (The Present Era)</h4>
+                        <p>마왕의 존재가 신화로 잊혀진 평화의 시대. 그러나 심연에서 불길한 기운이 요동치며 새로운 균열의 징조가 드리우기 시작하는 시기.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- [페이지 2] 세력 소개 -->
+        <section id="page-factions" class="page-section">
+            <h2 class="section-title">이그드리아의 주요 세력</h2>
+            <div class="grid-container" id="factionGrid"></div>
+        </section>
+
+        <!-- [페이지 3] 주요 인물 (주연) -->
+        <section id="page-main-chars" class="page-section">
+            <h2 class="section-title">주요 등장인물 (주연)</h2>
+            <div class="sub-tabs">
+                <button class="sub-tab-btn active" onclick="filterMain('all', this)">전체보기</button>
+                <button class="sub-tab-btn" onclick="filterMain('floria', this)">플로리아 왕국</button>
+                <button class="sub-tab-btn" onclick="filterMain('ignia', this)">이그니아 제국</button>
+                <button class="sub-tab-btn" onclick="filterMain('harvest', this)">하르베스트라 연맹국</button>
+                <button class="sub-tab-btn" onclick="filterMain('glacia', this)">글라시아 군국</button>
+                <button class="sub-tab-btn" onclick="filterMain('church', this)">교단</button>
+                <button class="sub-tab-btn" onclick="filterMain('abyss', this)">암천마계</button>
+                <button class="sub-tab-btn" onclick="filterMain('god', this)">신</button>
+            </div>
+            <div class="grid-container" id="mainCharGrid"></div>
+        </section>
+
+        <!-- [페이지 4] 조연 인물 -->
+        <section id="page-sub-chars" class="page-section">
+            <h2 class="section-title">조연 및 일반 클래스 도감 (24종)</h2>
+            <p style="color: var(--text-dim); margin-bottom: 25px;">대륙 각지에서 사회를 구성하고 모험을 함께하는 일반 캐릭터 및 직업군입니다.</p>
+            <div class="grid-container" id="subCharGrid"></div>
+        </section>
+
+        <!-- [페이지 5] 마수 도감 -->
+        <section id="page-monsters" class="page-section">
+            <h2 class="section-title">암천마계 마수 도감 (25종)</h2>
+            <p style="color: var(--text-dim); margin-bottom: 25px;">이그드리아 대륙 곳곳에 서식하는 마수들의 도감입니다.</p>
+            <div class="grid-container" id="monsterGrid"></div>
+        </section>
+    </div>
+
+    <!-- 🎵 우측 하단 배경음악(BGM) 플레이어 위젯 -->
+    <div id="bgm-player-box">
+        <div class="bgm-icon" id="bgmIcon">🌿</div>
+        <div>
+            <div class="bgm-title">TEMPLE BGM</div>
+        </div>
+        <button class="bgm-btn" id="bgmToggleBtn" onclick="toggleBgm()" title="재생 / 일시정지">▶</button>
+        <input type="range" class="bgm-volume" id="bgmVolume" min="0" max="1" step="0.05" value="0.4" onchange="changeVolume(this.value)" title="볼륨 조절">
+    </div>
+
+    <!-- 실제 오디오 요소 (loop: 반복 재생) -->
+    <audio id="bgmAudio" src="bgm.mp3" loop></audio>
+
+    <!-- 상세정보 모달 팝업 -->
+    <div class="modal" id="infoModal">
+        <div class="modal-box">
+            <span class="close-btn" onclick="closeModal()">&times;</span>
+            <div class="modal-img-box" id="modalImgBox"></div>
+            <div class="modal-title-area">
+                <h2 id="modalName">제목</h2>
+                <div class="tag-line" id="modalTag">태그 정보</div>
+            </div>
+            <div id="modalContent"></div>
+        </div>
+    </div>
+
+    <script>
+        // 세력 정보
+        const factionData = [
+            { 
+                id: "floria", 
+                name: "플로리아 왕국", 
+                sub: "대륙 동쪽 (봄)", 
+                img: "img/factions/floria.png", 
+                regions: "에버블룸 (수도) • 마법숲<br>북쪽: 실바레인 - 거목림<br>서쪽: 리버벨 - 무역·거대한 강<br>남쪽: 플로렌트 - 마법 아카데미·정원",
+                features: "종족평등주의, 마법발달, 노예제도 금지",
+                desc: "생명과 자연을 수호하는 에메랄드빛 봄의 왕국이다."
+            },
+            { 
+                id: "ignia", 
+                name: "이그니아 제국", 
+                sub: "대륙 남쪽 (여름)", 
+                img: "img/factions/ignia.png", 
+                regions: "솔라리온 (수도) • 황궁<br>북쪽: 발카르 - 군사 요새<br>서쪽: 사르카디아 - 제국 유일 평원·무역<br>동쪽: 이그노스 - 화산·대장장이 마을",
+                features: "인간우월주의, 대륙 최강국, 노예제도(이종족) 존재",
+                desc: "타오르는 태양 아래 철혈의 규율을 다지는 여름의 제국이다."
+            },
+            { 
+                id: "harvest", 
+                name: "하르베스트라 연맹국", 
+                sub: "대륙 서쪽 (가을)", 
+                img: "img/factions/harvest.png", 
+                regions: "골든필드 (수도) • 항구<br>남쪽: 카라벤 - 법정도시·재판·정보수집<br>동쪽: 밀하임 - 농경<br>북쪽: 벨타르 - 금융",
+                features: "자본주의, 개방적, 대륙 최대 상업·무역·산업, 모험가 다수 거주",
+                desc: "황금빛 결실과 계약의 기운이 맴도는 가을의 상업 연맹국이다."
+            },
+            { 
+                id: "glacia", 
+                name: "글라시아 군국", 
+                sub: "대륙 북쪽 (겨울)", 
+                img: "img/factions/glacia.png", 
+                regions: "아이젠하임 (수도) • 거대 성채<br>서쪽: 프리겔 - 마법 연구<br>남쪽: 노르발드 - 국경 요새<br>동쪽: 스카르딘 - 광산",
+                features: "강자우선주의, 약육강식, 수인 최다 분포, 폐쇄적·방어적",
+                desc: "혹한의 설원을 지배하며 강인한 무력을 자랑하는 겨울 군국이다."
+            },
+            { 
+                id: "church", 
+                name: "위그드라실 교단", 
+                sub: "소속: 성역 전역", 
+                img: "img/factions/church.png", 
+                regions: "성역 (수도) • 중앙 대성당 및 봉인 구역",
+                features: "세계수 신앙, 이단 심판, 봉인 수호",
+                desc: "세계수의 온기와 신성한 권능으로 대륙의 질서를 수호하는 교단이다."
+            },
+            { 
+                id: "abyss", 
+                name: "암천마계 & 심연", 
+                sub: "소속: 마계 전역", 
+                img: "img/factions/abyss.png", 
+                regions: "동쪽: 폐사림 - 죽은 숲<br>남쪽: 흑암대해 - 드넓은 심해<br>서쪽: 혈식평원 - 혈화 가득한 평원<br>북쪽: 열옥산맥 - 거대 화산 분지<br>중앙: 심연 입구 (마왕의 성좌)",
+                features: "4명의 군주는 마왕에게 복종, 1000년 만의 봉인 약화",
+                desc: "대륙의 어두운 지배자 타르타로스와 마수들이 도사리는 파괴의 영지이다."
+            }
+        ];
+
+        // 주요 인물 (주연 24인)
+        const mainChars = [
+            { name: "아르델린 플로리아", faction: "floria", img: "img/chars/ardelin.png", location: "플로리아 - 에버블룸", role: "여왕", race: "하이엘프", age: "328세", stat: "5써클", weapon: "-", mbti: "1w2", speech: "차분하고 자애로운 말투", chest: "거유", appearance: "금발 롱웨이브, 에메랄드 안, 우아한 엘프 귀, 맑은 백옥 피부", outfit: "순백 레이스 하이넥 드레스, 금빛 덩굴 자수, 연녹 시스루 로브, 나뭇가지 왕관", personality: "온화, 지혜, 포용", desc: "종족 공존 정책을 세운 정치적 지주이자 성군." },
+            { name: "카엘라 리버하트", faction: "floria", img: "img/chars/kaela.png", location: "플로리아 - 리버벨", role: "기사단장", race: "수인 (사슴)", age: "23세", stat: "익스퍼트 1급", weapon: "창", mbti: "1w2", speech: "직설적이고 군인 다운 말투", chest: "보통", appearance: "연갈색 단발, 갈색 사슴 귀, 사슴 뿔, 황금 안, 탄탄한 체형", outfit: "녹백 바디슈트, 경량 체스트 플레이트, 가죽 코르셋 벨트, 방수 망토", personality: "정의, 책임, 의리", desc: "군사적 요충지를 수호하는 현장 중심의 실전파." },
+            { name: "엘리시아 실바", faction: "floria", img: "img/chars/elysia.png", location: "플로리아 - 실바레인", role: "드루이드 (숲의 수호자)", race: "엘프", age: "113세", stat: "4써클", weapon: "드루이드 지팡이", mbti: "9w1", speech: "조용하고 부드러운 말투", chest: "거유", appearance: "녹색 웨이브 장발, 연두 안, 눈밑 자연 룬 각인, 엘프 귀", outfit: "시스루 녹색 레이스 로브 탑, 덩굴 가죽 코르셋, 차콜 그린 롱스커트", personality: "차분, 신비, 자연 애호", desc: "정령과 교감하며 대자연을 수호하는 드루이드 수장." },
+            { name: "루미에르 플로렌트", faction: "floria", img: "img/chars/lumiere.png", location: "플로리아 - 플로렌트", role: "아카데미 원장", race: "토끼 수인", age: "27세", stat: "9써클", weapon: "-", mbti: "5w4", speech: "빠르고 귀엽게 들뜬 말투", chest: "빈유", appearance: "헝클어진 백은발, 토끼 귀, 금안, 아담한 체형", outfit: "하이넥 검은 원피스, 흰금 연구원 롱코트, 오버니 스타킹", personality: "밝음, 집착, 천재", desc: "최연소 9써클 대마법사이자 전쟁 병기." },
+            { name: "레온하르트 이그니스", faction: "ignia", img: "img/chars/leonhart.png", location: "이그니아 - 솔라리온", role: "황제", race: "인간", age: "23세", stat: "마스터 2급", weapon: "롱소드", mbti: "8w7", speech: "엄격하고 단호한 명령형 말투", chest: "거유", appearance: "붉은 롱웨이브, 금안, 당당한 S라인 체형", outfit: "검은 가죽 바디슈트, 금색 판금 갑옷, 붉은 망토, 금색 미스릴 부츠", personality: "카리스마, 지배, 냉정", desc: "인간우월주의와 이종족 혐오를 내세우는 철혈 통치자이자 젊은 패왕." },
+            { name: "드라켄 바르카스", faction: "ignia", img: "img/chars/draken.png", location: "이그니아 - 발카르", role: "총지휘관", race: "인간", age: "32세", stat: "마스터 1급", weapon: "칠흑 대검", mbti: "1w9", speech: "짧고 건조한 말투", chest: "거유", appearance: "은발 포니테일, 붉은 안, 뺨 흉터, 구릿빛 체형", outfit: "붕대로 가슴 가림, 가죽 전투 바지, 가터스트랩", personality: "냉혹, 충성, 전투광", desc: "북방 국경을 지탱하는 제국의 검이자 최강 전력." },
+            { name: "브론다라 아이언피스트", faction: "ignia", img: "img/chars/brondara.png", location: "이그니아 - 이그노스", role: "대장장이 책임자", race: "드워프", age: "121세", stat: "익스퍼트 2급", weapon: "마그마 해머", mbti: "8w7", speech: "거칠고 시원시원한 말투", chest: "보통", appearance: "주황 양갈래, 주황 안, 아담하고 탄탄한 체형", outfit: "주황 가죽 튜브탑, 내열 가죽 앞치마, 내열 가죽 바지", personality: "직설, 거침, 장인정신", desc: "제국의 모든 무기 제작을 총괄하는 마스터 스미스." },
+            { name: "카시아 발테르", faction: "ignia", img: "img/chars/kassia.png", location: "이그니아 - 사르카디아", role: "발테르 백작", race: "인간", age: "28세", stat: "익스퍼트 3급", weapon: "레이피어", mbti: "3w4", speech: "부드럽고 날카로운 말투", chest: "보통", appearance: "금발 웨이브, 금안, 슬림한 S라인 체형", outfit: "적금 뷔스티에 코르셋, 검은 롱코트 망토, 가죽 팬츠, 가터벨트", personality: "교활, 계산, 정치적", desc: "사르카디아의 무역과 정보를 지배하는 위험한 실세." },
+            { name: "세라피나 벨테르", faction: "harvest", img: "img/chars/seraphina.png", location: "하르베스트라 연맹국 - 골든필드", role: "연맹의장", race: "인간", age: "30세", stat: "5써클", weapon: "-", mbti: "1w2", speech: "차분하고 논리적인 존댓말", chest: "보통", appearance: "딥 바이올렛 장발, 자수정 안, 슬림한 S라인 체형", outfit: "시스루 레이스 카라, 보라금 뷔스티에 롱코트, 가죽 팬츠", personality: "냉정, 지적, 정략적", desc: "자본주의와 손익 계산을 최우선으로 여기는 철저한 협상가." },
+            { name: "마리엘라 골든리프", faction: "harvest", img: "img/chars/mariella.png", location: "하르베스트라 연맹국 - 벨타르", role: "상인길드 대표", race: "엘프", age: "25세", stat: "4써클", weapon: "-", mbti: "3w2", speech: "느긋하고 능청스러운 말투", chest: "빈유", appearance: "황금 금발 단발, 황금 안, 엘프 귀, 슬림 글래머 체형", outfit: "녹금 상인의 복장, 시스루 숄, 황금 룬 가죽 코르셋", personality: "우아, 계산, 현실적", desc: "대륙 최대 상단인 골든리프 상단을 이끄는 실질적 경제 지배자." },
+            { name: "브리엘라 그레인하트", faction: "harvest", img: "img/chars/briella.png", location: "하르베스트라 연맹국 - 밀하임", role: "밀하임 영주", race: "양 수인", age: "27세", stat: "2써클", weapon: "-", mbti: "2w1", speech: "따뜻하고 포근한 존댓말", chest: "폭유", appearance: "아이보리 롱웨이브, 양 귀, 갈색 안, 볼륨감 있는 체형", outfit: "아이보리 하이넥 뷔스티에 드레스, 가죽 코르셋, 갈색 실크 롱스커트", personality: "온화, 성실, 책임감", desc: "대륙의 곡창지대를 책임지며 영지를 단호하게 수호하는 영주." },
+            { name: "카르멘 아우레시아", faction: "harvest", img: "img/chars/carmen.png", location: "하르베스트라 연맹국 - 카라벤", role: "블랙캣 마스터", race: "고양이 수인", age: "20세", stat: "익스퍼트 1급", weapon: "단검", mbti: "8w7", speech: "느긋하고 위험한 분위기의 말투", chest: "보통", appearance: "검은 칼단발, 검은 고양이 귀와 꼬리, 황금 안, 유연하고 탄탄한 체형", outfit: "타이트한 검은 가죽 바디슈트, 칠흑 코트, 가터스트랩, 오버니 부츠", personality: "냉철, 직감, 지배", desc: "대륙 최대 정보 및 암살 길드인 블랙캣을 지배하는 밤의 여왕." },
+            { name: "발키리아 스노우팽", faction: "glacia", img: "img/chars/valkyria.png", location: "글라시아 - 아이젠하임", role: "대원수", race: "늑대 수인", age: "34세", stat: "마스터 1급", weapon: "대형 장검", mbti: "8w9", speech: "단호하고 차가운 말투", chest: "거유", appearance: "은발 롱웨이브, 늑대 귀, 하늘색 안, 압도적인 S라인 체형", outfit: "검은 가죽 바디슈트, 늑대털 제복 코트, 룬 가죽 코르셋, 가죽 바지", personality: "냉혹, 강인, 전쟁", desc: "약육강식의 혹한을 지배하는 군국의 정점." },
+            { name: "프레이야 아이스클로", faction: "glacia", img: "img/chars/freyja.png", location: "글라시아 - 노르발드", role: "기사단장", race: "백호 수인", age: "29세", stat: "마스터 3급", weapon: "대검", mbti: "1w2", speech: "직설적인 기사관 말투", chest: "거유", appearance: "백색 단발, 백호 귀와 꼬리, 푸른 안, 탄탄한 체형", outfit: "은청색 미스릴 체스트 플레이트, 검은 바디슈트, 가죽 전투 바지", personality: "용맹, 직선, 명예", desc: "글라시아 군국 무력의 상징인 노르발드 기사단 선봉장." },
+            { name: "셀레네 프로스트", faction: "glacia", img: "img/chars/selene.png", location: "글라시아 - 프리겔", role: "수석연구관", race: "북극여우 수인", age: "20세", stat: "3써클", weapon: "마법서", mbti: "5w6", speech: "작고 차분한 말투", chest: "보통", appearance: "하늘색 브릿지 백발, 여우 귀와 꼬리, 하늘 안, 슬림한 체형", outfit: "차콜 블루 튜브탑, 백색 가죽 코르셋, 백청색 연구원 롱코트, 슬랙스", personality: "분석, 신비, 조용", desc: "빙결 마법을 다루며 기후를 분석하는 냉정한 관찰자." },
+            { name: "브리나 아이언하울", faction: "glacia", img: "img/chars/brina.png", location: "글라시아 - 스카르딘", role: "총괄장군", race: "드워프", age: "23세", stat: "익스퍼트 1급", weapon: "배틀엑스", mbti: "8w7", speech: "거칠고 굵직한 말투", chest: "빈유", appearance: "갈색 포니테일, 주황 안, 근육질의 드워프 체형", outfit: "짙은 갈색 내열 가죽탑, 금속 보강 가죽 앞치마, 전투 가죽 바지", personality: "거침, 직설, 강인", desc: "광산과 전장을 동시에 지배하는 괴력의 드워프 장군." },
+            { name: "아우렐리아 위그드라", faction: "church", img: "img/chars/aurelia.png", location: "교단 - 성역", role: "교황 · 성녀", race: "인간", age: "20세", stat: "-", weapon: "-", mbti: "9w1", speech: "부드럽고 자애로운 존댓말", chest: "폭유", appearance: "순백 롱웨이브, 투명한 흰 안, 유려한 S라인", outfit: "순백 실크 하이넥 로브, 성녀 뷔스티에 탑, 시스루 숄, 금빛 티아라", personality: "자비, 신성, 고요", desc: "유일신의 목소리를 듣는 유일한 존재이자 마왕 봉인의 진실을 아는 성녀." },
+            { name: "레오니아 발트하임", faction: "church", img: "img/chars/leonia.png", location: "교단 - 성역", role: "성기사단장", race: "인간", age: "25세", stat: "마스터 3급", weapon: "순백 장검", mbti: "1w2", speech: "단정하고 절도 있는 말투", chest: "보통", appearance: "백발 포니테일, 금안, 슬림한 체형", outfit: "순백금색 미스릴 체스트 플레이트, 검은 바디슈트, 가죽 전투 바지", personality: "엄격, 강직, 신앙", desc: "교황을 지키는 성역 최강의 방패이자 기사." },
+            { name: "타르타로스", faction: "abyss", img: "img/chars/tartaros.png", location: "암천마계 - 심연", role: "마왕 (타락한 대리인)", race: "반신", age: "불명", stat: "반신", weapon: "창조·파괴 마력", mbti: "5w6", speech: "무감정하고 차가운 말투", chest: "폭유", appearance: "칠흑 장발, 악마 뿔, 검녹색 천사 날개, 다크그린 브릿지, 다크그린 안, 도도한 S라인", outfit: "칠흑 레이스 하이넥 바디슈트, 타락 성녀 뷔스티에, 자수 롱로브 스커트", personality: "초월, 냉정, 절망", desc: "위그드라실의 첫 대리인이었으나 환멸을 느끼고 타락한 암천마계의 절대자." },
+            { name: "베르노스", faction: "abyss", img: "img/chars/vernos.png", location: "암천마계 - 폐사림", role: "부패의 군주", race: "마수", age: "불명", stat: "SSS", weapon: "가시 채찍", mbti: "2w3", speech: "부드럽고 치명적인 존댓말", chest: "거유", appearance: "적갈색 롱웨이브, 붉은 안, 우아한 S라인", outfit: "딥레드 레이스 하이넥 탑, 장미덩굴 가죽 코르셋, 딥그린 롱스커트", personality: "유혹, 잔혹, 느긋", desc: "부패와 독을 다루는 폐사림의 식물형 마수 수장." },
+            { name: "레비아탄", faction: "abyss", img: "img/chars/leviathan.png", location: "암천마계 - 흑암대해", role: "심해의 군주", race: "마수", age: "불명", stat: "SSS", weapon: "물의 창", mbti: "5w4", speech: "속도가 느리고 묵직한 말투", chest: "보통", appearance: "심해색 롱헤어, 청록 안, 슬림한 S라인", outfit: "딥블루 시스루 카라, 심해룡 비늘 코르셋 탑, 하이스릿 실크 드레스", personality: "침착, 냉정, 전략", desc: "심해 악룡의 본모습을 숨긴 흑암대해의 지배자." },
+            { name: "벨페라", faction: "abyss", img: "img/chars/belpera.png", location: "암천마계 - 혈식평원", role: "탐식의 군주", race: "마수", age: "불명", stat: "SSS", weapon: "-", mbti: "8w7", speech: "느긋하고 오만한 말투", chest: "빈유", appearance: "검은 양갈래, 붉은 안, 볼륨감 있는 베이글 체형", outfit: "하이넥 검은 고딕 뷔스티에, 붉은 시스루 오버레이, 고딕 롱스커트", personality: "유혹, 탐식, 잔혹", desc: "혈마법을 구사하는 흡혈귀이자 궁전의 여왕." },
+            { name: "카르나", faction: "abyss", img: "img/chars/karna.png", location: "암천마계 - 열옥산맥", role: "재앙의 군주", race: "마수", age: "불명", stat: "SSS", weapon: "화염 대검", mbti: "7w8", speech: "폭발적이고 거침없는 말투", chest: "거유", appearance: "붉은 포니테일, 용암빛 안, 구릿빛 근육형 S라인", outfit: "내열 검은 가죽 바디슈트, 용암 문양 코르셋 보호대, 가죽 바지", personality: "광기, 파괴, 전투광", desc: "용암과 화산을 다루며 산마저 부수는 압도적 괴력의 광전사." },
+            { name: "위그드라실", faction: "god", img: "img/chars/yggdrasil.png", location: "세계수 내면", role: "유일신", race: "신", age: "불명", stat: "신", weapon: "창조·파괴 마력", mbti: "1w2", speech: "부드럽고 따뜻한 말투", chest: "폭유", appearance: "갈색 롱헤어, 연두 브릿지, 연두 안, 성스러운 S라인", outfit: "순백 실크 하이넥 드레스, 세계수 나무 자수, 생명 잎사귀 벨트", personality: "온화, 다정", desc: "격의 손상을 감수하고 하계에 직접 개입한 이그드리아 대륙의 창조신." }
+        ];
+
+        // 조연 인물 목록
+        const subChars = [
+            { symbol: "a", name: "플로리아 병사", role: "왕국 병사", desc: "플로리아 왕국의 평화를 수호하는 국경 및 도시 경비 병사.", img: "img/subs/a.png" },
+            { symbol: "b", name: "이그니아 병사", role: "제국 병사", desc: "철혈의 규율 아래 훈련받은 이그니아 제국의 정예 보병.", img: "img/subs/b.png" },
+            { symbol: "c", name: "하르베스트라 병사", role: "연맹국 수비대", desc: "골든필드와 주요 상로를 보위하는 용병 출신 수비병.", img: "img/subs/c.png" },
+            { symbol: "d", name: "글라시아 병사", role: "군국 설원병", desc: "혹한의 동토에서 단련된 글라시아의 강인한 수인 전사.", img: "img/subs/d.png" },
+            { symbol: "e", name: "귀족 男", role: "귀족", desc: "영지를 소유하고 세력 내 정치에 영향력을 행사하는 남성 귀족.", img: "img/subs/e.png" },
+            { symbol: "f", name: "귀족 女", role: "귀족", desc: "상류층 사교계와 정략적 관계를 이끄는 여성 귀족.", img: "img/subs/f.png" },
+            { symbol: "g", name: "백성 男", role: "평민", desc: "농업, 수공업 등에 종사하며 대륙을 받치는 남성 주민.", img: "img/subs/g.png" },
+            { symbol: "h", name: "백성 女", role: "평민", desc: "마을과 영지에서 일상을 꾸려가는 여성 주민.", img: "img/subs/h.png" },
+            { symbol: "i", name: "모험가 男", role: "길드 모험가", desc: "던전 탐사와 마수 토벌을 수행하는 남성 모험가.", img: "img/subs/i.png" },
+            { symbol: "j", name: "모험가 女", role: "길드 모험가", desc: "수행과 보상을 위해 전장을 누비는 여성 모험가.", img: "img/subs/j.png" },
+            { symbol: "k", name: "접수원 男", role: "길드 직원", desc: "모험가 길드에서 의뢰를 배정하고 행정을 처리하는 직원.", img: "img/subs/k.png" },
+            { symbol: "l", name: "접수원 女", role: "길드 직원", desc: "친절한 미소로 모험가들의 수주와 정보 안내를 돕는 직원.", img: "img/subs/l.png" },
+            { symbol: "m", name: "여관주인 男", role: "주점/여관", desc: "여행자와 모험가들에게 휴식처와 소문을 제공하는 주인.", img: "img/subs/m.png" },
+            { symbol: "n", name: "여관주인 女", role: "주점/여관", desc: "따뜻한 음식과 방을 내어주는 수완 좋은 여관주인.", img: "img/subs/n.png" },
+            { symbol: "o", name: "대장장이", role: "장인", desc: "무기와 갑옷을 제련하고 장비를 정비하는 장인.", img: "img/subs/o.png" },
+            { symbol: "p", name: "연금술사", role: "연구원", desc: "포션 제조와 마도 재료 분석을 담당하는 연금술사.", img: "img/subs/p.png" },
+            { symbol: "q", name: "성직자 男", role: "교단 사제", desc: "세계수의 신성을 전파하고 신도들을 돌보는 사제.", img: "img/subs/q.png" },
+            { symbol: "r", name: "성직자 女", role: "교단 여사제", desc: "치유 마법으로 부상당한 이를 정화하는 여사제.", img: "img/subs/r.png" },
+            { symbol: "s", name: "상인 男", role: "상단 거상", desc: "대륙 교역로를 오가며 물자를 유통하는 거상.", img: "img/subs/s.png" },
+            { symbol: "t", name: "상인 女", role: "상단 행상", desc: "희귀한 물품을 수집하고 판매하는 행상인.", img: "img/subs/t.png" },
+            { symbol: "u", name: "범죄자 男", role: "무법자", desc: "어둠의 거리나 암시장에서 활개 치는 무법자.", img: "img/subs/u.png" },
+            { symbol: "v", name: "범죄자 女", role: "도적/암살자", desc: "그림자 속에서 도둑질과 은밀한 작업을 수행하는 인물.", img: "img/subs/v.png" },
+            { symbol: "w", name: "성기사 男", role: "교단 기사", desc: "성역의 안위와 이단 심판을 맡은 신성 기사.", img: "img/subs/w.png" },
+            { symbol: "x", name: "성기사 女", role: "교단 기사", desc: "신념을 위해 헌신하는 백은의 여성 성기사.", img: "img/subs/x.png" }
+        ];
+
+        // 마수 도감
+        const monsters = [
+            { name: "슬라임", symbol: "YG.粘", img: "img/monsters/slime.png", type: "점액형 마수", desc: "물리 공격을 흡수하며 상대를 집어삼키는 기초 마수." },
+            { name: "고블린", symbol: "YG.鬼", img: "img/monsters/goblin.png", type: "야만형 마수", desc: "무리 지어 사냥을 일삼는 소형 마수." },
+            { name: "골렘", symbol: "YG.傀", img: "img/monsters/golem.png", type: "중장형 마수", desc: "바위와 마력석이 결합한 거대 인형 마수." },
+            { name: "스켈레톤", symbol: "YG.骸", img: "img/monsters/skeleton.png", type: "언데드형 마수", desc: "사령 마력에 의해 되살아난 백골 전사." },
+            { name: "서큐버스", symbol: "YG.魅", img: "img/monsters/succubus.png", type: "환술형 마수", desc: "상대의 정신을 유혹하는 매혹적인 마수." },
+            { name: "오크", symbol: "YG.豚", img: "img/monsters/orc.png", type: "돌격형 마수", desc: "강인한 완력을 자랑하는 야만 전사형 마수." },
+            { name: "알라우네", symbol: "YG.華", img: "img/monsters/alraune.png", type: "식물형 마수", desc: "꽃의 향기로 사냥감을 유인하는 식물 마수." },
+            { name: "트렌트", symbol: "YG.樹", img: "img/monsters/treant.png", type: "거목형 마수", desc: "살아움직이는 고대의 거대 나무 마수." },
+            { name: "나가", symbol: "YG.蛇", img: "img/monsters/naga.png", type: "사신형 마수", desc: "상체는 인간, 하체는 뱀의 형상을 한 습지 마수." },
+            { name: "하피", symbol: "YG.禽", img: "img/monsters/harpy.png", type: "조인형 마수", desc: "상공에서 급습하는 날카로운 비행 마수." },
+            { name: "샐러맨더", symbol: "YG.蜥", img: "img/monsters/salamander.png", type: "화염형 마수", desc: "고온의 화염을 내뿜는 도마뱀 마수." },
+            { name: "듀라한", symbol: "YG.騎", img: "img/monsters/dullahan.png", type: "기마 언데드", desc: "목이 잘린 채 암흑마를 탄 기사형 마수." },
+            { name: "리치", symbol: "YG.咒", img: "img/monsters/lich.png", type: "마법 언데드", desc: "불사의 권능을 얻은 사악한 흑마법사." },
+            { name: "딥원", symbol: "YG.魚", img: "img/monsters/deepone.png", type: "수중형 마수", desc: "선박을 습격하는 심해 어류형 마수." },
+            { name: "샌드웜", symbol: "YG.蟲", img: "img/monsters/sandworm.png", type: "거대충형 마수", desc: "지면 아래에서 진동을 감지하고 급습하는 거대 벌레." },
+            { name: "그리핀", symbol: "YG.鷲", img: "img/monsters/griffin.png", type: "환수형 마수", desc: "사자의 몸과 독수리의 날개를 지닌 환수." },
+            { name: "미노타우르스", symbol: "YG.牛", img: "img/monsters/minotaur.png", type: "수인전사형 마수", desc: "거대한 도끼를 휘두르는 소 머리의 광전사." },
+            { name: "악마", symbol: "YG.魔", img: "img/monsters/demon.png", type: "상위 마족", desc: "지능과 파괴력을 겸비한 상위 생명체." },
+            { name: "펜리르", symbol: "YG.狼", img: "img/monsters/fenrir.png", type: "야수형 마수", desc: "얼음의 이빨을 지닌 거대 설원 늑대." },
+            { name: "바실리스크", symbol: "YG.毒", img: "img/monsters/basilisk.png", type: "독사형 마수", desc: "시선으로 석화시키며 맹독을 내뿜는 마수." },
+            { name: "만티코어", symbol: "YG.獸", img: "img/monsters/manticore.png", type: "환수형 마수", desc: "사자 몸, 인간 얼굴, 전갈 꼬리의 복합 마수." },
+            { name: "베헤모스", symbol: "YG.巨", img: "img/monsters/behemoth.png", type: "거대수형 마수", desc: "산맥을 뒤흔드는 압도적인 덩치의 거수." },
+            { name: "히드라", symbol: "YG.九", img: "img/monsters/hydra.png", type: "다두룡 마수", desc: "잘려도 계속 재생되는 머리를 가진 수룡." },
+            { name: "드래곤", symbol: "YG.龍", img: "img/monsters/dragon.png", type: "최상위 용족", desc: "마계 최고봉, 원초적 재앙이라 불리는 지고의 파괴룡." },
+            { name: "크라켄", symbol: "YG.烏", img: "img/monsters/kraken.png", type: "해양거수 마수", desc: "거대 촉수로 배를 끌어내리는 해양 재앙." }
+        ];
+
+        // 🎵 BGM 컨트롤 스크립트
+        const audio = document.getElementById('bgmAudio');
+        const playBtn = document.getElementById('bgmToggleBtn');
+        const bgmIcon = document.getElementById('bgmIcon');
+
+        function toggleBgm() {
+            if (audio.paused) {
+                audio.play().then(() => {
+                    playBtn.innerText = "❚❚";
+                    bgmIcon.classList.add('playing');
+                }).catch(e => {
+                    console.log("자동 재생 정책으로 인해 차단되었거나 파일이 없습니다.", e);
+                });
+            } else {
+                audio.pause();
+                playBtn.innerText = "▶";
+                bgmIcon.classList.remove('playing');
+            }
+        }
+
+        function changeVolume(val) {
+            audio.volume = val;
+        }
+
+        // 페이지 전환
+        function switchPage(pageId, btn) {
+            document.querySelectorAll('.page-section').forEach(sec => sec.classList.remove('active'));
+            document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+            
+            document.getElementById('page-' + pageId).classList.add('active');
+            btn.classList.add('active');
+        }
+
+        function getImgStyle(imgPath) {
+            return imgPath ? `style="background-image: url('${imgPath}');"` : '';
+        }
+
+        // 세력 렌더링
+        function renderFactions() {
+            const grid = document.getElementById('factionGrid');
+            grid.innerHTML = '';
+            factionData.forEach(f => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="card-img-box" ${getImgStyle(f.img)}></div>
+                    <div class="card-body">
+                        <span class="badge">${f.sub}</span>
+                        <h3>${f.name}</h3>
+                        <div style="font-size: 0.88rem; color: var(--gold-light); line-height: 1.6; margin-bottom: 12px;">
+                            <strong>[세력 지역]</strong><br>
+                            ${f.regions}
+                        </div>
+                        <hr style="border: none; border-top: 1px solid rgba(223, 183, 108, 0.25); margin-bottom: 12px;">
+                        <p style="font-size: 0.85rem; color: var(--text-dim); margin-bottom: 8px;"><strong>[특징]</strong> ${f.features}</p>
+                        <p>${f.desc}</p>
+                    </div>
+                `;
+                card.onclick = () => openModalSimple(
+                    f.name, 
+                    f.sub, 
+                    `<strong>[세력 지역]</strong><br>${f.regions}<br><br><hr style="border: none; border-top: 1px solid rgba(223, 183, 108, 0.3); margin: 15px 0;"><br><strong>[세력 특징]</strong><br>${f.features}<br><br><hr style="border: none; border-top: 1px solid rgba(223, 183, 108, 0.3); margin: 15px 0;"><br><strong>[설명]</strong><br>${f.desc}`, 
+                    f.img
+                );
+                grid.appendChild(card);
+            });
+        }
+
+        // 주연 렌더링
+        function renderMainChars(filter = 'all') {
+            const grid = document.getElementById('mainCharGrid');
+            grid.innerHTML = '';
+            const filtered = filter === 'all' ? mainChars : mainChars.filter(c => c.faction === filter);
+
+            filtered.forEach(c => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="card-img-box" ${getImgStyle(c.img)}></div>
+                    <div class="card-body">
+                        <span class="badge">${c.location}</span>
+                        <h3>${c.name}</h3>
+                        <div class="sub-info">${c.role} | ${c.stat}</div>
+                        <p>${c.desc}</p>
+                    </div>
+                `;
+                card.onclick = () => openModalChar(c);
+                grid.appendChild(card);
+            });
+        }
+
+        function filterMain(faction, btn) {
+            document.querySelectorAll('.sub-tab-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderMainChars(faction);
+        }
+
+        // 조연 렌더링
+        function renderSubChars() {
+            const grid = document.getElementById('subCharGrid');
+            grid.innerHTML = '';
+            subChars.forEach(c => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="card-img-box" ${getImgStyle(c.img)}></div>
+                    <div class="card-body">
+                        <span class="badge">[${c.symbol}] • ${c.role}</span>
+                        <h3>${c.name}</h3>
+                        <p>${c.desc}</p>
+                    </div>
+                `;
+                card.onclick = () => openModalSimple(`[${c.symbol}] ${c.name}`, `조연 및 일반 직업군 • ${c.role}`, c.desc, c.img);
+                grid.appendChild(card);
+            });
+        }
+
+        // 마수 렌더링
+        function renderMonsters() {
+            const grid = document.getElementById('monsterGrid');
+            grid.innerHTML = '';
+            monsters.forEach(m => {
+                const card = document.createElement('div');
+                card.className = 'card';
+                card.innerHTML = `
+                    <div class="card-img-box" ${getImgStyle(m.img)}></div>
+                    <div class="card-body">
+                        <span class="badge" style="background:rgba(82,163,115,0.2); color:var(--leaf-green);">${m.symbol} • ${m.type}</span>
+                        <h3>${m.name}</h3>
+                        <p>${m.desc}</p>
+                    </div>
+                `;
+                card.onclick = () => openModalSimple(`${m.symbol} ${m.name}`, `마수 도감 • ${m.type}`, m.desc, m.img);
+                grid.appendChild(card);
+            });
+        }
+
+        // 상세 모달 (주연용)
+        function openModalChar(c) {
+            const modalImg = document.getElementById('modalImgBox');
+            if(c.img) {
+                modalImg.style.backgroundImage = `url('${c.img}')`;
+                modalImg.style.display = 'block';
+            } else {
+                modalImg.style.backgroundImage = '';
+            }
+
+            document.getElementById('modalName').innerText = c.name;
+            document.getElementById('modalTag').innerText = `${c.location} • ${c.role}`;
+            
+            let chestHTML = c.chest !== '-' ? `<div class="info-row"><strong>가슴 크기</strong> ${c.chest}</div>` : '';
+            let weaponHTML = c.weapon !== '-' ? `<div class="info-row"><strong>주무기</strong> ${c.weapon}</div>` : '';
+
+            document.getElementById('modalContent').innerHTML = `
+                <div class="info-row"><strong>종족 / 나이</strong> ${c.race} / ${c.age}</div>
+                <div class="info-row"><strong>경지 / 서클</strong> ${c.stat}</div>
+                ${weaponHTML}
+                <div class="info-row"><strong>애니어그램</strong> ${c.mbti}</div>
+                <div class="info-row"><strong>말투</strong> ${c.speech}</div>
+                ${chestHTML}
+                <div class="info-row"><strong>성격</strong> ${c.personality}</div>
+                <div class="info-row"><strong>외형 특징</strong> ${c.appearance}</div>
+                <div class="info-row"><strong>착용 의상</strong> ${c.outfit}</div>
+                <div class="info-desc-box">
+                    <strong style="color:var(--gold-divine); display:block; margin-bottom:8px;">인물 배경 및 특징</strong>
+                    ${c.desc}
+                </div>
+            `;
+            document.getElementById('infoModal').style.display = 'flex';
+        }
+
+        // 공통 모달
+        function openModalSimple(title, tag, desc, imgPath) {
+            const modalImg = document.getElementById('modalImgBox');
+            if(imgPath) {
+                modalImg.style.backgroundImage = `url('${imgPath}')`;
+                modalImg.style.display = 'block';
+            } else {
+                modalImg.style.backgroundImage = '';
+            }
+
+            document.getElementById('modalName').innerText = title;
+            document.getElementById('modalTag').innerText = tag;
+            document.getElementById('modalContent').innerHTML = `
+                <div class="info-desc-box" style="margin-top:0; border-top:none;">
+                    <p style="font-size: 1.05rem; line-height: 1.8;">${desc}</p>
+                </div>
+            `;
+            document.getElementById('infoModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('infoModal').style.display = 'none';
+        }
+
+        function enterWorld() {
+            document.getElementById('gate-screen').classList.add('hidden');
+            document.getElementById('main-content').classList.add('visible');
+            
+            // 입장 버튼을 누를 때 BGM 자동 재생 시도 (브라우저 정책 대응)
+            audio.play().then(() => {
+                playBtn.innerText = "❚❚";
+                bgmIcon.classList.add('playing');
+            }).catch(() => {
+                console.log("사용자 상호작용 후 재생 대기 중");
+            });
+        }
+
+        // 초기 실행
+        renderFactions();
+        renderMainChars();
+        renderSubChars();
+        renderMonsters();
+    </script>
+</body>
+</html>
